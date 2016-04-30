@@ -1,114 +1,193 @@
+#Importing the reqired files
 print "\nimporting files(formula.py, hero.py)..."
-
 import formula
 import hero
-
 print "importing is now complete!\n"
 
+#############################################  CLASS DEFINATIONS  #############################################################
 
-#global variable to take#
-############################################
+class DotaStats(object):
+	pass
 
-hero_data = hero.jug
-hero_name = 'juggernaut'
-type = 'agi'
-lvl = 10
-stats = 0
-###########################################
-bat = hero_data['bat']
-base_dmg = hero_data['dmg']
-base_ms = hero_data['ms']
-base_hp = hero_data['b_health']
-hp_regen = hero_data['h_regen']
-mana_regen = hero_data['m_regen']
-base_mana = hero_data['mana']
-base_magic_resis = hero_data['magic_resis']
-
-base_agi = hero_data['b_agi']
-base_str = hero_data['b_str']
-base_int = hero_data['b_int']
-
-agi_gain = hero_data['agi_gain']
-str_gain = hero_data['str_gain']
-int_gain = hero_data['int_gain']
-
-item_agi = 0.0				#affected by agi
-item_str = 0.0				#affected by str
-item_int = 0.0
-
-ms_boost = 0.0
-percent_boost = 0.0
-item_hp_pool = 0.0
-item_mana_pool = 0.0
-item_regen = 0
-skill_regen = 0
-item_armor = 0
-magic_dmg_1 = 0
-magic_dmg_2 = 0
-magic_dmg_3 = 0
-magic_dmg_4 = 0
-magic_resis_1 = 0
-magic_resis_2 = 0  #negative value for resistance decrease
-
-bonus_dmg = 0
-enemy_armor = 3
-base_dmg_mult = 0
-enemy_dmg_block = 0
-armor_peirce = 100
-gen_dmg_mult = 0
-crit_mult = 0
-
-
-
-if type == 'agi':
-	base_attribute_dmg = hero_data['b_agi'] #depends on hero attribute type
-	item_attribute = item_agi
-	lvl_gain = hero_data['agi_gain']
-elif type == 'str':
-	base_attribute_dmg = hero_data['b_str']
-	item_attribute = item_str
-	lvl_gain = hero_data['str_gain']
-elif type == 'int':
-	base_attribute_dmg = hero_data['b_int']
-	item_attribute = item_int
-	lvl_gain = hero_data['int_gain']
-
-
-
-
-
-
-def jug_starting_stats ():
-	print "These are the the starting stats for %s:\n" % hero_name
-	attack_speed = formula.attack_speed(base_agi,item_agi,bat, lvl, agi_gain, stats)
-	print "%-20s %.3f" % ('Attack Speed:', attack_speed)
-	main_dmg = formula.main_dmg(base_dmg, base_attribute_dmg, item_attribute, lvl , lvl_gain, stats)
-	print "%-20s %.3f" % ('Main dmg:', main_dmg)
-	phy_dmg = main_dmg + bonus_dmg
-	print "%-20s %.1f" % ('Physical dmg:', phy_dmg)
-	tot_dmg = formula.final_attack_dmg(main_dmg, base_dmg_mult, bonus_dmg, enemy_dmg_block, enemy_armor, armor_peirce, gen_dmg_mult, crit_mult)
-	print "%-20s %.3f" % ('Final phy dmg: ', tot_dmg)
-	move_speed = formula.move_speed(base_ms, ms_boost, percent_boost)
-	print "%-20s %.3f" % ('Move speed:', move_speed)
-	hp_pool = formula.hp_pool(base_str,item_str, item_hp_pool,base_hp, lvl, str_gain, stats)
-	print "%-20s %.3f" % ('Hp pool:', hp_pool)
-	health_regen = formula.hp_regen(base_str, item_str, lvl, str_gain, stats, item_regen, skill_regen, hp_regen)
-	print "%-20s %.3f" % ('Hp regen:', health_regen)
-	mana_pool = formula.mana_pool (item_int, base_int, item_mana_pool, lvl, int_gain, stats, base_mana)
-	print "%-20s %.3f" % ('Mana pool:', mana_pool)
-	m_regen = formula.mana_regen ( item_int, base_int, lvl, int_gain, stats, mana_regen, item_regen, skill_regen)
-	print "%-20s %.3f" % ('Mana regen:', m_regen)
-	tot_armor = formula.armor_pool ( item_agi, base_agi, lvl, agi_gain, stats, item_armor)
-	print "%-20s %.3f" % ('Total armor:', tot_armor)
-	armor_def = formula.armor_reduction (tot_armor)
-	print "%-20s %.1f" % ('% phy dmg taken:', armor_def*100)
-	mag_resis = formula.magic_resistance(base_magic_resis, magic_resis_1, magic_resis_2)
-	print "%-20s %.3f" % ('% Magic resistance: ', mag_resis)
-	mag_dmg = formula.magic_dmg(magic_dmg_1, base_int, item_int, lvl, int_gain, stats, magic_dmg_2, magic_dmg_3, magic_dmg_4)
-	print "%-20s %.3f" % ('Total magic dmg: ', mag_dmg)
+	
+class HeroStats(DotaStats):
+	''' Initializes all the basic hero stats; not inclusive of hero spells; not inclusive of item builds 
+		The said stats can be grouped into two types:
+			1. The default fixed stats that can be found in the hero profile wiki page. Eg. BAT, Base MS
+			2. Variable stats such as Level, stats upgrade which require user input '''
+			
+	#golbal variables that still needs to be added
+	#hero armor type
+	
+	t1_tower_armor = 1
+	t2_tower_armor = 3
 	
 	
+	
+	def __init__(self, hero_name, level = 1, stat_points = 0.0, enemy_dmg_block = 0, enemy_armor = 0,\
+				enemy_armor_type = 0, dd_rune = False, haste_rune = False, tower_tier = 0, fountain_regen = False):
+		#initializing the User initiated stats
+		
+		self.hero_name = hero_name
+		self.level = level 	
+		self.stats = stat_points
+		self.dd_rune = dd_rune
+		self.haste_rune = haste_rune				
+		self.fountain_regen = fountain_regen
+		self.enemy_dmg_block = enemy_dmg_block
+		self.enemy_armor = enemy_armor
+		self.enemy_armor_type = enemy_armor_type
+		
+		#tower tier is inputed as 1,2,3 or 4 representing t1, t2, t3 and t4 towers respectively
+		if tower_tier == 1:						
+			self.tower_armor = t1_tower_armor
+		elif tower_tier == 0:
+			self.tower_armor = 0
+		else:
+			self.tower_armor = t2_tower_armor
+			
+		
+	def import_hero_database(self, import_file):
+		'''IMPORTANT----REQUIRES CALLING TO USE OTHER MODULES IN THIS CLASS--------'''
+		#importing the hero database from another file and initializing it
+		
+		f = import_file 					#imp: the passed import_file should be import from hero.py where the dict is saved
+		self.type = f['type']				#main attribute (agi, str or int)
+		self.bat = f['bat']					#base attack time
+		self.base_dmg = f['dmg']			#base damage (not inclusive of main stat attribute)
+		self.base_ms = f['ms']				#base movement speed
+		self.base_hp = f['b_health']		#base hp exclusive of base strength stat
+		self.base_hp_regen = f['h_regen']	#base hp regen exclusive of base strength stat
+		self.base_mana_regen = f['m_regen']
+		self.base_mana = f['mana']
+		self.base_magic_resis = f['magic_resis']
 
-jug_starting_stats()
-raw_input("\npress any key to continue...\n>")
+		self.base_agi = f['b_agi']
+		self.base_str = f['b_str']
+		self.base_int = f['b_int']
+		self.agi_gain = f['agi_gain']
+		self.str_gain = f['str_gain']
+		self.int_gain = f['int_gain']
+		
+		if self.type == 'agi':
+			self.prime_attr_dmg = f['b_agi'] 		#dmg which depends on hero primary attribute type
+			self.prime_attr_gain = f['agi_gain']
+		elif self.type == 'str':
+			self.prime_attr_dmg = f['b_str']
+			self.prime_attr_gain = f['str_gain']
+		elif self.type == 'int':
+			self.prime_attr_dmg = f['b_int']
+			self.prime_attr_gain = f['int_gain']
+		else:
+			print "illegal input detected"
+
+	'''  NEED TO MODIFY FUNCTION NAMES OF FORMULA.PY; CHANGE HOW LVL -1 IS CALCULATED; AND CHANGE PASSED VARIABLE NAMES IN THE FORMULA FUNCT.'''	
+	
+	def get_attack_speed(self):
+		'''Note need to change program if import file name changes; uses formula. to gain access to formula'''
+		#gets attack_speed without items and spells. 
+		self.attack_speed = formula.attack_speed(self.base_agi, 0, self.bat, self.level, self.agi_gain, self.stats)
+		return self.attack_speed
+		
+	def get_main_phy_dmg(self):
+		#returns main damage without considering items and spells.(main dmg is total dmg from attributes; excludes bonus dmg )
+		self.main_phy_dmg = formula.main_dmg(self.base_dmg, self.prime_attr_dmg, 0, self.level , self.prime_attr_gain, self.stats)
+		return self.main_phy_dmg
+	
+	def get_physical_dmg(self):
+		#total physical dmg before reductions
+		if self.dd_rune == True:
+			self.physical_dmg = self.main_phy_dmg * 2
+		else:
+			self.physical_dmg = self.main_phy_dmg
+		return self.physical_dmg
+	
+	def get_final_phy_dmg(self):
+		#total physical dmg dealt to enemy after reductions
+		if self.dd_rune == True:
+			self.final_phy_dmg = formula.final_attack_dmg(self.main_phy_dmg, 0, self.main_phy_dmg, self.enemy_dmg_block,\
+								 self.enemy_armor, self.enemy_armor_type) #main_phy_dmg is passed twice, 1 for the bonus dmg from dd rune.
+		else:
+			self.final_phy_dmg = formula.final_attack_dmg(self.main_phy_dmg, 0, 0, self.enemy_dmg_block, self.enemy_armor)
+		return self.final_phy_dmg
+			
+	def get_ms(self):
+		#returns total movement speed; excludes item and skill bonus
+		if self.haste_rune == False:
+			self.ms = formula.move_speed(self.base_ms)
+		else: 
+			self.ms = 522.0
+		return self.ms
+	
+	def get_hp_pool(self):
+		#returns the total hp pool; excludes item and skill bonus
+		self.hp_pool = formula.hp_pool(self.base_str, 0, 0, self.base_hp, self.level, self.str_gain, self.stats)
+		return self.hp_pool
+		
+	def get_hp_regen(self):
+		#returns the total hp regen; excludes item and skil bonus
+		
+		if self.fountain_regen == True:
+			bonus_regen = (0.4/100.0) * self.hp_pool * 10
+			self.hp_regen = formula.hp_regen(self.base_str, 0, self.level, self.str_gain, self.stats, bonus_regen, 0, self.base_hp_regen)
+		else:
+			self.hp_regen = formula.hp_regen(self.base_str, 0, self.level, self.str_gain, self.stats, 0, 0, self.base_hp_regen)
+		return self.hp_regen
+		
+	def get_mana_pool(self):
+		#returns the total mana pool; excludes item and skill bonus
+		self.mana_pool = formula.mana_pool(0, self.base_int, 0, self.level, self.int_gain, self.stats, self.base_mana)
+		return self.mana_pool
+		
+	def get_mana_regen(self):
+		#returns total mana regen; excludes item and skill bonus
+		if self.fountain_regen == False:
+			self.mana_regen = formula.mana_regen(0, self.base_int, self.level, self.int_gain, self.stats, self.base_mana_regen)
+		else:
+			bonus_regen = ((0.4/100.0) * self.mana_pool + 1.4)* 10
+			self.mana_regen = formula.mana_regen(0, self.base_int, self.level, self.int_gain, self.stats, self.base_mana_regen, bonus_regen)
+		return self.mana_regen
+		
+	def get_armor(self):
+		#returns total armor value without reductions; excludes item and skills
+		self.armor = formula.armor_pool(0, self.base_agi, self.level, self.agi_gain, self.stats, 0, self.tower_armor)
+		return self.armor
+		
+	def get_armor_resistance(self):
+		#returns the percentage of incoming physical dmg taken after armor calculation.
+		self.armor_resistance = formula.armor_reduction(self.armor)
+		return self.armor_resistance
+		
+	def get_magic_resistance(self):
+		#returns the percentage of incoming magic dmg taken
+		self.magic_resistance = formula.magic_resistance(self.base_magic_resis)
+		return self.magic_resistance
+			
+class ItemStats(DotaStats):
+	pass
+
+############################################  MAIN PROGRAM ######################################################################
+
+
+
+def jug_starting_stats():
+	#prints the starting stats of jugg at lvl 1.
+	jug = HeroStats('jug', 1)
+	jug.import_hero_database(hero.jug)
+	print "These are the the starting stats for %s:\n" %jug.hero_name
+	print "%-20s %.3f" % ('Attack Speed:', jug.get_attack_speed())
+	print "%-20s %.3f" % ('Main dmg:', jug.get_main_phy_dmg())
+	print "%-20s %.1f" % ('Physical dmg:', jug.get_physical_dmg())
+	print "%-20s %.3f" % ('Final phy dmg: ', jug.get_final_phy_dmg())
+	print "%-20s %.3f" % ('Move speed:', jug.get_ms())
+	print "%-20s %.3f" % ('Hp pool:', jug.get_hp_pool())
+	print "%-20s %.3f" % ('Hp regen:', jug.get_hp_regen())
+	print "%-20s %.3f" % ('Mana pool:', jug.get_mana_pool())
+	print "%-20s %.3f" % ('Mana regen:', jug.get_mana_regen())
+	print "%-20s %.3f" % ('Total armor:', jug.get_armor())
+	print "%-20s %.1f" % ('% phy dmg taken:', jug.get_armor_resistance())
+	print "%-20s %.3f" % ('% Magic resistance: ', jug.get_magic_resistance())
+	
+jug_starting_stats()	
+	
 
