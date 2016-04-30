@@ -56,11 +56,11 @@ def mana_regen (item_int, base_int = 0, lvl= 0, int_gain = 0, stats= 0, base_reg
     intel_based = intel * 0.04
     return base_regen + item_regen + skill_regen + intel_based
         
-def armor_pool (item_agi, base_agi = 0, lvl = 0, agi_gain = 0, stats = 0, item_armor = 0.0):
+def armor_pool (item_agi, base_agi = 0, lvl = 0, agi_gain = 0, stats = 0, item_armor = 0.0, tower_bonus = 0,reduction = 0.0):
     if lvl > 0: lvl -= 1
     agility = item_agi + base_agi + stats*2 + lvl * agi_gain
     armor = agility * 0.14
-    total_armor = armor +  item_armor
+    total_armor = armor +  item_armor - reduction + tower_bonus
     return total_armor
     
 def armor_reduction (armor):
