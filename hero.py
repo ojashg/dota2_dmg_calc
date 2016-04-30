@@ -15,5 +15,6 @@ jug = {	   'b_health' : 200.0,
            'b_int' : 14,
            'str_gain' : 1.9,
            'agi_gain' : 2.4,
-           'int_gain' : 1.4}
+           'int_gain' : 1.4,
+		   'type': 'agi'}
            
